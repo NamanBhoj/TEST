@@ -6,6 +6,7 @@ import pandas
 import json
 from pprint import pprint
 from moviepy.editor import concatenate_videoclips, VideoFileClip
+from PIL import Image
 
 """cut out face and center videos """
 
@@ -45,7 +46,7 @@ def readjson_coordinates_face(data):
 
     #check frame by frame i.e index by index
     try:
-        for i in range(0,len(datas['Unnamed: 0'])) :
+        for i in range(0,len(datas['x1'])) :
         # Coordinates
             x_min = datas['x1'][str(i)]
             x_min_ar.append(x_min)
@@ -89,7 +90,7 @@ def readjson_coordinates_center(data):
 
     
     try:
-        for  i in range(0, len(datas['Unnamed: 0'])):
+        for  i in range(0, len(datas['x1'])):
         # Coordinates
             x_min = datas['rect_x1']['0']
             x_min_ar.append(x_min)
@@ -116,18 +117,51 @@ def readjson_coordinates_center(data):
    
     return all
 
-def crop_face(video,coordinate_data,length_json):
-    filenames = []
+def crop_face(video,coordinate_data):
+    
     import os
     values = readjson_coordinates_face(coordinate_data)
-    length = readjson_coordinates_center(length_json)
+    # length = readjson_coordinates_center(length_json)
     # the first two arguments in crop are the width and height of the o/p video the other two are position to start
     #we define the o/p based on xmax-xmin whereas starting point is defined by xmin and ymin
     #TODO Read documentation here : https://ffmpeg.org/ffmpeg-filters.html#crop
-
-    print(len(length[0]))
+    
+    #TODO: EXTRACTING  FRAME CODE
     # os.system(' mkdir frames')
     # os.system(f'ffmpeg -i {video} frames/out-%03d.jpg')
+
+
+    #TODO: Code for cropping of images framewise
+    print((values)) #array with 4 list element x1,y1,x2,y2 values
+    os.system(' mkdir frames_cropped')
+    
+    # print(image_path_save)
+    for i in range(1,len(values[0])):
+        print("running")
+        if i <10:
+            im = Image.open(f'W:\TEST\\frames\\out-00{i}.jpg')
+        elif i>=10 and i <100:
+            im = Image.open(f'W:\TEST\\frames\out-0{i}.jpg')
+        else:
+            im = Image.open(f'W:\TEST\\frames\out-{i}.jpg')
+
+        # im1 = im.crop((xmin, ymin, xmax, ymax))
+        im1 = im.crop((values[0][i], values[1][i], values[2][i], values[3][i]))
+        im1.save(f'frames_cropped\\frames_cropped{i}.jpg')
+
+
+    #TODO: Create video from cropped frames and after that delete both frames and frames_cropped
+    
+  
+
+
+       
+
+
+  
+
+
+
     # for i in range(0, len(length[0]),600):
 
     #     output_x = values[2][i]- values[0][i]
@@ -161,7 +195,7 @@ def video_overlay(bigvid,smallvid):
     os.system(f'ffmpeg -i {bigvid} -vf "movie={smallvid},scale=150:-1[inner];[in][inner] overlay=main_w-(overlay_w+10):10" completed.mp4')
 
 
-crop_face(r'W:\TEST\concatenate.mp4',r'W:\TEST\fileface.json', r'W:\TEST\filecenter.json')
+crop_face(r'W:\TEST\concatenate.mp4',r'W:\TEST\fileface.json')
 # crop_centre(r'W:\TEST\clip3.mp4',r'W:\TEST\filecenter.json')
 
 # video_overlay(r'W:\TEST\croppedvideo.mp4',r'croppedface.mp4')
