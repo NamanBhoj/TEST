@@ -43,7 +43,7 @@ class JSONIFY:
                 # print(csv_face_data)
                 
                
-                json_data = csv_face_data.to_json(PATH + '\\fileface_151.json')
+                json_data = csv_face_data.to_json(PATH + '\\fileface_recorded.json')
                 print(json_data)
 
         def jsonify_centre(self,csvcenter) -> dict:
@@ -52,7 +52,7 @@ class JSONIFY:
               
                 csv_data = (csv_data.drop('frameId',axis = 1))
                 print(csv_data)
-                json_data = csv_data.to_json(PATH + '\\filecenter_151.json')
+                json_data = csv_data.to_json(PATH + '\\filecenter_recorded.json')
                 print(json_data)
 
 

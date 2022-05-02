@@ -8,6 +8,7 @@ from PIL import Image
 from moviepy.editor import *
 import os
 import argparse
+import cv2
 
 #TODO: Remove file with existing name if use provided that name already
 """cut out face and center videos using frame based approach """
@@ -128,6 +129,8 @@ def crop_face(video,webcam_coordinate_data,smallvidname):
     
     import os
     values = readjson_coordinates_face(webcam_coordinate_data)
+  
+    #ERROR RESOLVED BY BELOW LINE, ERROR OF NOT DIVISIBLE BY 2 
     
     #TODO Read documentation here : https://ffmpeg.org/ffmpeg-filters.html#crop
     
@@ -137,11 +140,34 @@ def crop_face(video,webcam_coordinate_data,smallvidname):
 
     #TODO:use open cv to create frames instead of ffmpeg
     #-vsync 2 is added for removing fmore than 1000 frames duplicated warninqg/erro
-    os.system(f'ffmpeg -i {video} -vsync 2 {smallvidname}frames/%d.jpg') #creates frames for video inside folder {smallvidname}frames
-    print(f" FRAME CREATION ENDED, CREATED FRAMES ARE AT {smallvidname}frames")
-    import time
-    time.sleep(1)
-    # # TODO: Code for cropping of frame images in frames folder images framewise
+    print("EXTRACTION OF FRAMES STARTED")
+    cap = cv2.VideoCapture(video)
+    video_length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT)) - 1
+    print ("Number of frames: ", video_length)
+    count = 0
+    print ("Converting video..\n")
+    # Start converting the video
+    while cap.isOpened():
+        # Extract the frame
+        ret, frame = cap.read()
+        print(f'FRAME {count} created')
+        if not ret:
+            continue
+        # Write the results back to output location.
+        cv2.imwrite(f"{smallvidname}frames/%d.jpg" % (count+1), frame)
+        count = count + 1
+        if (count > (video_length-1)):
+            # Log the time again
+          
+            # Release the feed
+            cap.release()
+            print(f" FRAME CREATION ENDED, CREATED FRAMES ARE AT {smallvidname}frames")
+
+    # os.system(f'ffmpeg -i {video} -vsync 2 {smallvidname}frames/%d.jpg') #creates frames for video inside folder {smallvidname}frames
+    
+    # import time
+    # time.sleep(1)
+    # # # TODO: Code for cropping of frame images in frames folder images framewise
     # print(values[0])
     os.system(f' mkdir {smallvidname}frames_cropped')
 
@@ -163,7 +189,7 @@ def crop_face(video,webcam_coordinate_data,smallvidname):
 
 
     
-    #   TODO : INSTEAD OF ITERATING ON VALUE ITERATE ON FRAME VALUE
+    #TODO: INSTEAD OF ITERATING ON VALUE ITERATE ON FRAME VALUE
     # print((values[0]))
     count1 = os.listdir(f'W:\TEST\{smallvidname}frames')
     print(len(count1))
@@ -183,7 +209,7 @@ def crop_face(video,webcam_coordinate_data,smallvidname):
         im1 = im.crop((values[0][i], values[1][i], values[2][i], values[3][i]))
         im1.save(f'{smallvidname}frames_cropped\\{i}.jpg')
     print(f"ALL THE FRAMES HAVE BEEN CROPPED AND SAVED TO {smallvidname}frames_cropped")
-    # os.system(" rm -rf frames")
+
 
     #TODO: TO SORT THE CLIPS OTHERWISE WHEN RETRIEVED ARE UNSORTED, TO UNDERSTAND RUN LINE 148 AND 149 ONLY
     count = os.listdir(f'W:\TEST\{smallvidname}frames_cropped')
@@ -281,7 +307,8 @@ def video_overlay_and_9_16(bigvidname,smallvidname,finalvidname):
     print(smallvidname)
     overlayed_name = f"OVERLAY{bigvidname[:-4]}_{smallvidname[:-4]}.mp4"
     #TODO: KEEP THE SMALL VID AS SAME DIRECTORY AS THIS FILE
-    os.system(f'ffmpeg -i Bigvid/{bigvidname} -vf  "movie=Smallvid/{smallvidname} , overlay=main_w-(overlay_w+10):10"  Overlay/{overlayed_name}')
+    #scale=150:-1 ,,, main_w-(overlay_w+10):10
+    os.system(f'ffmpeg -i Bigvid/{bigvidname} -vf  "movie=Smallvid/{smallvidname}, scale =100:-2[inner];[in][inner]  overlay=10:10"  Overlay/{overlayed_name}')
     # os.system(f'ffmpeg -i Bigvid/{bigvidname} -i Smallvid/{smallvidname} scale=2*iw:2*ih  , overlay=main_w-(overlay_w+10):10 [out]   Overlay/{overlayed_name}')
     print(f"OVERLAYED VIDEO {overlayed_name}")
 
@@ -303,9 +330,9 @@ def video_overlay_and_9_16(bigvidname,smallvidname,finalvidname):
 #master function to run everything
 def master(video,webcam_coordinate_data,smallvidname,center_coordinate_data,bigvidname,finalvidname):
     # STEP1: has 3 different mini steps
-    # crop_face(video,webcam_coordinate_data,smallvidname)
+    crop_face(video,webcam_coordinate_data,smallvidname)
     # STEP2:
-    # crop_centre(video,center_coordinate_data,bigvidname)
+    crop_centre(video,center_coordinate_data,bigvidname)
     # STEP3 and 4 included:
     video_overlay_and_9_16(bigvidname,smallvidname,finalvidname)
 
