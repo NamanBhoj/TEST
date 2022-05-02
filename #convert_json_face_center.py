@@ -31,28 +31,28 @@ class JSONIFY:
                 y1 = csv_face_data.iloc[len(csv_face_data)-1]['y1']
                 x2 = csv_face_data.iloc[len(csv_face_data)-1]['x2']
                 y2 = csv_face_data.iloc[len(csv_face_data)-1]['y2']
-                appendlist.append(x1)
-                appendlist.append(y1)
-                appendlist.append(x2)
-                appendlist.append(y2)
-                csv_face_data = (csv_face_data.drop('Unnamed: 0',axis = 1))
-                for  i in range(0,difference):
-                        csv_face_data.loc[len(csv_face_data.index)] = appendlist
-                print("______________*************")
-                print(len(csv_face_data))
-                print(csv_face_data)
+                # appendlist.append(x1)
+                # appendlist.append(y1)
+                # appendlist.append(x2)
+                # appendlist.append(y2)
+                # csv_face_data = (csv_face_data.drop('frameId',axis = 1))
+                # for  i in range(0,difference):
+                #         csv_face_data.loc[len(csv_face_data.index)] = appendlist
+                # print("______________*************")
+                # print(len(csv_face_data))
+                # print(csv_face_data)
                 
                
-                json_data = csv_face_data.to_json(PATH + '\\fileface_concatenate.json')
+                json_data = csv_face_data.to_json(PATH + '\\fileface_151.json')
                 print(json_data)
 
         def jsonify_centre(self,csvcenter) -> dict:
                 """returns json from the csv file for the center csv"""
                 csv_data = pd.read_csv(csvcenter)
               
-                csv_data = (csv_data.drop('Unnamed: 0',axis = 1))
+                csv_data = (csv_data.drop('frameId',axis = 1))
                 print(csv_data)
-                json_data = csv_data.to_json(PATH + '\\filecenter_concatenate.json')
+                json_data = csv_data.to_json(PATH + '\\filecenter_151.json')
                 print(json_data)
 
 

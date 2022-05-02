@@ -134,9 +134,13 @@ def crop_face(video,webcam_coordinate_data,smallvidname):
     #TODO: EXTRACTING  FRAME CODE
     print("FRAME CREATING STARTED")
     os.system(f' mkdir {smallvidname}frames')
-    os.system(f'ffmpeg -i {video} {smallvidname}frames/%d.jpg') #creates frames for video inside folder {smallvidname}frames
-    print(f" FRAME CREATION ENDED, CREATED FRAMES ARE AT {smallvidname}frames")
 
+    #TODO:use open cv to create frames instead of ffmpeg
+    #-vsync 2 is added for removing fmore than 1000 frames duplicated warninqg/erro
+    os.system(f'ffmpeg -i {video} -vsync 2 {smallvidname}frames/%d.jpg') #creates frames for video inside folder {smallvidname}frames
+    print(f" FRAME CREATION ENDED, CREATED FRAMES ARE AT {smallvidname}frames")
+    import time
+    time.sleep(1)
     # # TODO: Code for cropping of frame images in frames folder images framewise
     # print(values[0])
     os.system(f' mkdir {smallvidname}frames_cropped')
@@ -159,8 +163,17 @@ def crop_face(video,webcam_coordinate_data,smallvidname):
 
 
     
-    
-    for i in range(1,len(values[0])):
+    #   TODO : INSTEAD OF ITERATING ON VALUE ITERATE ON FRAME VALUE
+    # print((values[0]))
+    count1 = os.listdir(f'W:\TEST\{smallvidname}frames')
+    print(len(count1))
+    if len(count1) < len(values[0]):
+        iterate_times = len(count1)
+    else:
+        iterate_times = len(values[0])
+
+    #TODO: IF REMOVE THE -10 IN RANGE GET ERROR
+    for i in range(1,iterate_times):
         print(f"CROPPING WEBCAM PART OF FRAME {i} AND SAVING IT TO {smallvidname}frames_cropped")
     
        
@@ -181,7 +194,7 @@ def crop_face(video,webcam_coordinate_data,smallvidname):
         a.append(count_numbers[i])
     
     print(a) #the files are not sorted
-    # TODO:SORTS INTEGER STRING AND THEN WE WILL ADD .JPG AGAIN LATER
+    # # TODO:SORTS INTEGER STRING AND THEN WE WILL ADD .JPG AGAIN LATER
     a.sort(key = int)# this will sort the files inside the array
     print(a) 
 
@@ -206,6 +219,7 @@ def crop_face(video,webcam_coordinate_data,smallvidname):
 
     video_clip = concatenate_videoclips(clips,method ='compose')
     video_clip.write_videofile(f'Smallvid/{smallvidname}', fps = fps_val)
+    # os.system(f"ffmpeg -i Smallvid/{smallvidname} -vf scale=400:400  Smallvid/{smallvidname[:-4]}.mp4")
 
     print(f"THE PROCESS TO CREATE WEBCAM VIDEO {smallvidname} HAS ENDED")
     print("BEGINNING CREATION OF CENTER CLIPS")
@@ -252,7 +266,7 @@ def crop_centre(video,center_coordinate_data,bigvidname):
     #https://video.stackexchange.com/questions/4563/how-can-i-crop-a-video-with-ffmpeg
     # os.system(f"ffmpeg -i {video} -vf crop=iw/2 {video_opname}")
     os.system(f"ffmpeg -i {video} -vf crop={values[0][0]}:{values[1][0]} -aspect 9:16 Bigvid/{bigvidname}")
-
+    # os.system(f"ffmpeg -i Bigvid/{bigvidname} -vf scale=1080:1920  Bigvid/{bigvidname[:-4]}.mp4")
     print(f"CENTER CLIP CREATION HAS ENDED. CREATED A VIDEO NAMED {bigvidname}")
 
     #see first example here https://ffmpeg.org/ffmpeg-filters.html#cropdetect
@@ -267,7 +281,8 @@ def video_overlay_and_9_16(bigvidname,smallvidname,finalvidname):
     print(smallvidname)
     overlayed_name = f"OVERLAY{bigvidname[:-4]}_{smallvidname[:-4]}.mp4"
     #TODO: KEEP THE SMALL VID AS SAME DIRECTORY AS THIS FILE
-    os.system(f'ffmpeg -i Bigvid/{bigvidname} -vf "movie=Smallvid/{smallvidname},scale=150:-1[inner];[in][inner] overlay=main_w-(overlay_w+10):10"  Overlay/{overlayed_name}')
+    os.system(f'ffmpeg -i Bigvid/{bigvidname} -vf  "movie=Smallvid/{smallvidname} , overlay=main_w-(overlay_w+10):10"  Overlay/{overlayed_name}')
+    # os.system(f'ffmpeg -i Bigvid/{bigvidname} -i Smallvid/{smallvidname} scale=2*iw:2*ih  , overlay=main_w-(overlay_w+10):10 [out]   Overlay/{overlayed_name}')
     print(f"OVERLAYED VIDEO {overlayed_name}")
 
     print(f"PROCESS TO SCALE VIDEO {overlayed_name} TO TIKTOK FORMAT STARTED")
@@ -275,7 +290,7 @@ def video_overlay_and_9_16(bigvidname,smallvidname,finalvidname):
     print(f"WILL CREATE VIDEO NAMED {finalvidname} ONCE THE PROCESS IS DONE")
     #https://ottverse.com/change-resolution-resize-scale-video-using-ffmpeg/
     os.system(f"ffmpeg -i Overlay/{overlayed_name} -vf scale=1080:1920  Finalvid/FINAL{finalvidname}.mp4")
-    print("PROCESS ENDED FINAL VIDEO NAMED FINAL{finalvidname}.mp4 CREATED")
+    print(f"PROCESS ENDED FINAL VIDEO NAMED FINAL{finalvidname}.mp4 CREATED")
     
 
 
@@ -288,16 +303,16 @@ def video_overlay_and_9_16(bigvidname,smallvidname,finalvidname):
 #master function to run everything
 def master(video,webcam_coordinate_data,smallvidname,center_coordinate_data,bigvidname,finalvidname):
     # STEP1: has 3 different mini steps
-    crop_face(video,webcam_coordinate_data,smallvidname)
+    # crop_face(video,webcam_coordinate_data,smallvidname)
     # STEP2:
-    crop_centre(video,center_coordinate_data,bigvidname)
+    # crop_centre(video,center_coordinate_data,bigvidname)
     # STEP3 and 4 included:
     video_overlay_and_9_16(bigvidname,smallvidname,finalvidname)
 
     print("THE WHOLE PIPELINE RAN SUCCESSFULLY")
 
 # master('W:/TEST/concatenate.mp4','W:/TEST/fileface_concatenate.json',"smallvid.mp4",'W:/TEST/filecenter_concatenate.json',"bigvid.mp4","pipeline")
-# crop_face(r'W:\TEST\concatenate.mp4',r'W:\TEST\fileface_concatenate.json',"smallvid.mp4")
+# crop_face(r'W:\TEST\recorded.mp4',r'W:\TEST\fileface_151.json',"recordedsmall.mp4")
 # crop_centre(r'W:\TEST\concatenate.mp4',r'W:\TEST\filecenter_concatenate.json',"bigvid.mp4")
 # video_overlay(r'bigvid.mp4',r'smallvid.mp4')
 # video_9_16(r"W:\\TEST\\OVERLAYbigvi_smallvi.mp4", "FIFA")
@@ -305,16 +320,23 @@ def master(video,webcam_coordinate_data,smallvidname,center_coordinate_data,bigv
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Runs the Tiktok Video Creationg Pipeline")
-    parser.add_argument('--video',required= True)
-    parser.add_argument('--webcam_coordinate_data',required= True)
-    parser.add_argument('--smallvidname',required= True)
-    parser.add_argument('--center_coordinate_data',required= True)
-    parser.add_argument('--bigvidname',required= True)
-    parser.add_argument('--finalvidname',required= True)
+    # parser.add_argument('--video',required= True)
+    # parser.add_argument('--webcam_coordinate_data',required= True)
+    # parser.add_argument('--smallvidname',required= True)
+    # parser.add_argument('--center_coordinate_data',required= True)
+    # parser.add_argument('--bigvidname',required= True)
+    # parser.add_argument('--finalvidname',required= True)
+    parser.add_argument('--v',required= True)
+    parser.add_argument('--wcd',required= True)
+    parser.add_argument('--svn',required= True)
+    parser.add_argument('--ccd',required= True)
+    parser.add_argument('--bvn',required= True)
+    parser.add_argument('--fvn',required= True)
     args = parser.parse_args()
 
 
-    master(args.video,args.webcam_coordinate_data,args.smallvidname,args.center_coordinate_data,args.bigvidname,args.finalvidname)
+    # master(args.video,args.webcam_coordinate_data,args.smallvidname,args.center_coordinate_data,args.bigvidname,args.finalvidname)
+    master(args.v,args.wcd,args.svn,args.ccd,args.bvn,args.fvn)
 
-
+# master('W:/TEST/concatenate.mp4','W:/TEST/fileface_concatenate.json',"smallvid.mp4",'W:/TEST/filecenter_concatenate.json',"bigvid.mp4","pipeline")
     
