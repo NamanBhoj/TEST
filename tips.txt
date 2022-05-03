@@ -1,0 +1,4 @@
+1) keep all filenames as file_name , not as "file name" ffmpeg has difficulty reading those
+
+
+2) the ai output is not perfect it may return different number for center and face

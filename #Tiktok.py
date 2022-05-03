@@ -129,6 +129,7 @@ def crop_face(video,webcam_coordinate_data,smallvidname):
     
     import os
     values = readjson_coordinates_face(webcam_coordinate_data)
+    print(len(values))
   
     #ERROR RESOLVED BY BELOW LINE, ERROR OF NOT DIVISIBLE BY 2 
     
@@ -156,14 +157,14 @@ def crop_face(video,webcam_coordinate_data,smallvidname):
         # Write the results back to output location.
         cv2.imwrite(f"{smallvidname}frames/%d.jpg" % (count+1), frame)
         count = count + 1
-        if (count > (video_length-1)):
+        if (count > (video_length-2)):
             # Log the time again
           
             # Release the feed
             cap.release()
             print(f" FRAME CREATION ENDED, CREATED FRAMES ARE AT {smallvidname}frames")
 
-    # os.system(f'ffmpeg -i {video} -vsync 2 {smallvidname}frames/%d.jpg') #creates frames for video inside folder {smallvidname}frames
+    os.system(f'ffmpeg -i {video} -vsync 2 {smallvidname}frames/%d.jpg') #creates frames for video inside folder {smallvidname}frames
     
     # import time
     # time.sleep(1)
@@ -252,27 +253,7 @@ def crop_face(video,webcam_coordinate_data,smallvidname):
   
 
 
-    #TODO: Create video from cropped frames and after that delete both frames and frames_cropped
     
-  
-
-
-
-    # TODO: OLDSOLUTION
-    # for i in range(0, len(length[0]),600):
-
-    #     output_x = values[2][i]- values[0][i]
-    #     output_y = values[3][i] - values[1][i]
-    #     output_x = values[2][i]- values[0][i] 
-    #     pprint(output_x)
-    #     output_y = values[3][i] - values[1][i]
-    #     pprint(output_y)
-    #     filenames.append(f"concatenatecropped{i}.mp4")
-    #     os.system(f'ffmpeg -i {video} -vf crop={output_x}:{output_y}:{values[0][i]}:{values[1][i]} concatenatecropped{i}.mp4')
-
-    #     print(filenames)
-    # result_clip = concatenate_videoclips([VideoFileClip('concatenatecropped0.mp4'), VideoFileClip('concatenatecropped600.mp4')])
-    # result_clip.write_videofile('merged.mp4')
 
    
 
@@ -308,7 +289,7 @@ def video_overlay_and_9_16(bigvidname,smallvidname,finalvidname):
     overlayed_name = f"OVERLAY{bigvidname[:-4]}_{smallvidname[:-4]}.mp4"
     #TODO: KEEP THE SMALL VID AS SAME DIRECTORY AS THIS FILE
     #scale=150:-1 ,,, main_w-(overlay_w+10):10
-    os.system(f'ffmpeg -i Bigvid/{bigvidname} -vf  "movie=Smallvid/{smallvidname}, scale =100:-2[inner];[in][inner]  overlay=10:10"  Overlay/{overlayed_name}')
+    os.system(f'ffmpeg -i Bigvid/{bigvidname} -vf  "movie=Smallvid/{smallvidname}, scale =150:-2[inner];[in][inner]  overlay=10:10"  Overlay/{overlayed_name}')
     # os.system(f'ffmpeg -i Bigvid/{bigvidname} -i Smallvid/{smallvidname} scale=2*iw:2*ih  , overlay=main_w-(overlay_w+10):10 [out]   Overlay/{overlayed_name}')
     print(f"OVERLAYED VIDEO {overlayed_name}")
 
@@ -338,21 +319,10 @@ def master(video,webcam_coordinate_data,smallvidname,center_coordinate_data,bigv
 
     print("THE WHOLE PIPELINE RAN SUCCESSFULLY")
 
-# master('W:/TEST/concatenate.mp4','W:/TEST/fileface_concatenate.json',"smallvid.mp4",'W:/TEST/filecenter_concatenate.json',"bigvid.mp4","pipeline")
-# crop_face(r'W:\TEST\recorded.mp4',r'W:\TEST\fileface_151.json',"recordedsmall.mp4")
-# crop_centre(r'W:\TEST\concatenate.mp4',r'W:\TEST\filecenter_concatenate.json',"bigvid.mp4")
-# video_overlay(r'bigvid.mp4',r'smallvid.mp4')
-# video_9_16(r"W:\\TEST\\OVERLAYbigvi_smallvi.mp4", "FIFA")
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Runs the Tiktok Video Creationg Pipeline")
-    # parser.add_argument('--video',required= True)
-    # parser.add_argument('--webcam_coordinate_data',required= True)
-    # parser.add_argument('--smallvidname',required= True)
-    # parser.add_argument('--center_coordinate_data',required= True)
-    # parser.add_argument('--bigvidname',required= True)
-    # parser.add_argument('--finalvidname',required= True)
     parser.add_argument('--v',required= True)
     parser.add_argument('--wcd',required= True)
     parser.add_argument('--svn',required= True)
@@ -366,4 +336,9 @@ if __name__ == '__main__':
     master(args.v,args.wcd,args.svn,args.ccd,args.bvn,args.fvn)
 
 # master('W:/TEST/concatenate.mp4','W:/TEST/fileface_concatenate.json',"smallvid.mp4",'W:/TEST/filecenter_concatenate.json',"bigvid.mp4","pipeline")
-    
+
+# master('W:/TEST/concatenate.mp4','W:/TEST/fileface_concatenate.json',"smallvid.mp4",'W:/TEST/filecenter_concatenate.json',"bigvid.mp4","pipeline")
+# crop_face(r'W:\TEST\recorded.mp4',r'W:\TEST\fileface_151.json',"recordedsmall.mp4")
+# crop_centre(r'W:\TEST\concatenate.mp4',r'W:\TEST\filecenter_concatenate.json',"bigvid.mp4")
+# video_overlay(r'bigvid.mp4',r'smallvid.mp4')
+# video_9_16(r"W:\\TEST\\OVERLAYbigvi_smallvi.mp4", "FIFA")
